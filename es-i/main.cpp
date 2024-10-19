@@ -105,6 +105,10 @@
 
 // -1 means not visited
 // -2 means invalid path
+/**
+  TODO should not map the entire matrix but only until value is not found.
+  When value is found must exit.
+ */
 void map_distances(
   std::vector<std::vector<char>> const & board,
   std::vector<std::vector<int>>& result,
