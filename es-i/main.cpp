@@ -113,7 +113,7 @@ void map_distances(
   int start_value,
   int coming_from
 ) {
-  // std::cout << "map_distances" << std::endl;
+  // std::cout << "map_distances " << start_row << ", " << start_col << " " << start_value << std::endl;
   if (start_row < 0 || start_row >= board.size()) return;
   if (start_col < 0 || start_col >= board.at(0).size()) return;
   if (board[start_row][start_col] == '#') {
@@ -128,33 +128,60 @@ void map_distances(
 
   // Going right on same row
   for(int x0 = 1; x0 < board.at(0).size() - start_col; x0++){
-    if (board[start_row][start_col + x0] == '#' || 
-        (result[start_row][start_col + x0] >= 0 && result[start_row][start_col + x0] < start_value)) {
-      result[start_row][start_col + x0] = -2;
-      std::cout << "found wall at " << start_row << ", " << start_col + x0 << std::endl;
+    int y = start_col + x0;
+    int x = start_row;
+
+    if ((result[x][y] >= 0 && result[x][y] < start_value)) break; // Already visited
+
+    if (board[x][y] == '#') {
+      result[x][y] = -2;
 
       break;
     }
 
-    result[start_row][start_col + x0] = start_value + x0;
+    result[x][y] = start_value + x0;
+
+    if (x > 0 && y > 0 && board.size() > x && y < board.at(0).size() && board[x - 1][y - 1] == '#' && board[x - 1][y] != '#') {
+      // std::cout << "i've a wall top-left. I'm at " << x << ", " << y << " . I am " << result[x][y] << " " << std::endl;
+      map_distances(board, result, x - 1, y, start_value + x0 + 1, 2);
+    }
+
+    if (y > 0 && x + 1 < board.size() && board[x + 1][y - 1] == '#' && board[x + 1][y] != '#') {
+      // std::cout << "i've a wall bottom-left. I'm at " << x << ", " << y << " . I am " << result[x][y] << " " << std::endl;
+      map_distances(board, result, x + 1, y, start_value + x0 + 1, 1);
+    }
   }
 
   // Going left on same row
   for(int x0 = 0; start_col - x0 > 0; x0++){
     int y = start_col - x0 - 1;
-    if (board[start_row][y] == '#' || 
-        (result[start_row][y] >= 0 && result[start_row][y] < start_value)) {
-      result[start_row][y] = -2;
+    int x = start_row;
+    if (result[x][y] >= 0 && result[x][y] < start_value) break; // Already visited
+
+    if (board[x][y] == '#') {
+      result[x][y] = -2;
       break;
     }
 
-    result[start_row][y] = start_value + x0 + 1;
+    const int value = start_value + x0 + 1;
+
+    result[x][y] = value;
+
+    if (x+1 < board.size() && y+1 < board.at(0).size() && board[x + 1][y + 1] == '#' && board[x + 1][y] != '#'){
+      // std::cout << "i've a wall bottom-right. I'm at " << x << ", " << y << " . I am " << result[x][y] << " " << std::endl;
+      map_distances(board, result, x+1, y, value + 1, 1);
+    }
+
+    if (x > 0 && y > 0 && board[x-1][y+1] == '#' && board[x-1][y] != '#') {
+      // std::cout << "i've a wall top-right. I'm at " << x << ", " << y << " . I am " << result[x][y] << " " << std::endl;
+      map_distances(board, result, x-1, y, value + 1, 2);
+    }
   }
 
   // Going down on same column
   if (coming_from != 2) map_distances(board, result, start_row + 1, start_col, start_value + 1, 1);
 
-  if (coming_from != 1) map_distances(board, result, start_row - 1, start_col, start_value + 1, 2);
+  if (coming_from != 1 && start_row > 0) map_distances(board, result, start_row - 1, start_col, start_value + 1, 2);
 }
 
 std::vector<std::vector<int>> map_distances(
