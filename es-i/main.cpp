@@ -116,7 +116,7 @@ int shortest_path(
     std::cout << std::endl;
   }
 
-  return 0;
+  return distances.at(dest_row).at(dest_col);
 }
 
 int main() {
@@ -163,12 +163,14 @@ int main() {
         std::cout << std::endl;
     }
 
-    int just4fun = shortest_path(matrix, start_row, start_col, end_row, end_col);
-    std::cout << "Just for fun: " << just4fun << std::endl;
+    // int just4fun = shortest_path(matrix, start_row, start_col, end_row, end_col);
+    // std::cout << "Just for fun: " << just4fun << std::endl;
 
-    return 0;
+    // return 0;
 
     int ideal_foot_time = std::abs((int)start_row - (int)end_row) + std::abs((int)start_col - (int)end_col);
+    std::cout << "Ideal foot time: " << ideal_foot_time << std::endl;
+
     /**
       Shuttle to take
      */
@@ -216,10 +218,10 @@ int main() {
       shuttle_time = shuttle_to_take_distance + shuttle_to_arrive_distance + 1;
     }
 
-      // std::cout << "Shuttle time: " << shuttle_time << std::endl;
+    std::cout << "Shuttle time: " << shuttle_time << std::endl;
     // std::cout << "Foot time: " << foot_time << std::endl;
     int foot_time = -1;
-    if (ideal_foot_time < shuttle_time && shuttle_time != -1) {
+    if (shuttle_time == -1 || ideal_foot_time < shuttle_time) {
       // std::cout << "calculating foot time" << std::endl;
       foot_time = shortest_path(matrix, start_row, start_col, end_row, end_col);
     } else {
@@ -231,7 +233,7 @@ int main() {
     if (shuttle_time != -1) total = shuttle_time;
     if (foot_time != -1 && (total == -1 || foot_time < total)) total = foot_time;
 
-    // std::cout << "Min time: " << total << std::endl;
+    std::cout << "Min time: " << std::endl;
     std::cout << total << std::endl;
 
     return 0;
